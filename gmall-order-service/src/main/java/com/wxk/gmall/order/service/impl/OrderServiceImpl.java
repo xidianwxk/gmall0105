@@ -148,18 +148,21 @@ public class OrderServiceImpl implements OrderService {
             Queue payhment_success_queue = session.createQueue("ORDER_PAY_QUEUE");
             MessageProducer producer = session.createProducer(payhment_success_queue);
             TextMessage textMessage=new ActiveMQTextMessage();//字符串文本
-            //MapMessage mapMessage = new ActiveMQMapMessage();// hash结构
+            //MapMessage mapMessage = new ActiveMQMapMessage();// hash结构      库存
 
             // 查询订单的对象，转化成json字符串，存入ORDER_PAY_QUEUE的消息队列
-//            OmsOrder omsOrderParam = new OmsOrder();
-//            omsOrderParam.setOrderSn(omsOrder.getOrderSn());
-//            OmsOrder omsOrderResponse = omsOrderMapper.selectOne(omsOrderParam);
-//
-//            OmsOrderItem omsOrderItemParam = new OmsOrderItem();
-//            omsOrderItemParam.setOrderSn(omsOrderParam.getOrderSn());
-//            List<OmsOrderItem> select = omsOrderItemMapper.select(omsOrderItemParam);
-//            omsOrderResponse.setOmsOrderItems(select);
-//            textMessage.setText(JSON.toJSONString(omsOrderResponse));
+            //库存部分
+            OmsOrder omsOrderParam = new OmsOrder();
+            omsOrderParam.setOrderSn(omsOrder.getOrderSn());
+            OmsOrder omsOrderResponse = omsOrderMapper.selectOne(omsOrderParam);
+
+            OmsOrderItem omsOrderItemParam = new OmsOrderItem();
+            omsOrderItemParam.setOrderSn(omsOrderParam.getOrderSn());
+            List<OmsOrderItem> select = omsOrderItemMapper.select(omsOrderItemParam);
+
+            omsOrderResponse.setOmsOrderItems(select);
+            textMessage.setText(JSON.toJSONString(omsOrder));
+
             omsOrderMapper.updateByExampleSelective(omsOrderUpdate,example);
 
             producer.send(textMessage);

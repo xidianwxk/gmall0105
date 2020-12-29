@@ -29,3 +29,6 @@ gamll-order-web  用户认证中心    8086
 
 
 gmall-payment     支付对接  8087
+
+gware-manage     库存   9001
+
