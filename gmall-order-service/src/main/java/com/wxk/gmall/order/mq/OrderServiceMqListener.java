@@ -13,7 +13,6 @@ import javax.jms.MapMessage;
 @Component
 public class OrderServiceMqListener {
 
-
     @Autowired
     OrderService orderService;
 
@@ -29,8 +28,5 @@ public class OrderServiceMqListener {
         orderService.updateOrder(omsOrder);
 
         System.out.println("**********************************");
-
-
-
     }
 }

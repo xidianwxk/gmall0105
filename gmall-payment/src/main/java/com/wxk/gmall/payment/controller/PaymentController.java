@@ -61,6 +61,7 @@ public class PaymentController {
         // 通过支付宝的paramsMap进行签名验证，2.0版本的接口将paramsMap参数去掉了，导致同步请求没法验签
         if(StringUtils.isNotBlank(sign)){
             // 验签成功
+            // 幂等性检查   updatePayment（实现）
             PaymentInfo paymentInfo = new PaymentInfo();
             paymentInfo.setOrderSn(out_trade_no);
             paymentInfo.setPaymentStatus("已支付");
@@ -130,7 +131,14 @@ public class PaymentController {
         paymentInfo.setTotalAmount(totalAmount);
         paymentService.savePaymentInfo(paymentInfo);
 
+        //向消息中间件发送一个检查支付状态（支付服务消息）的延迟消息队列   《=》定时任务 ：不够灵活
+        //支付结束    解除延迟任务/设置新的延迟任务
+        paymentService.sendDelayPaymentResultCheckQueue(outTradeNo, 5);    //检查当前订单的支付状态
+        //循环检查    当前订单的支付状态
 
+        // 支付成功      更新订单状态    （重复更新问题 => 幂等性检查  服务器相同的写请求 只做一次  ）
+
+        //提交请求到支付宝
         return form;
     }
 
